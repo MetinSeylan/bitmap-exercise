@@ -1,5 +1,8 @@
 import { Config } from './config';
+import { Reader } from './reader';
 
 const config = new Config();
+config.validate();
 
-console.log(config.getBitmapMax(), config.getBitmapMin());
+const reader = new Reader(config);
+reader.read();
