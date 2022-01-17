@@ -2,13 +2,16 @@ import * as LineByLine from 'n-readlines';
 import { Config } from './config';
 import * as Joi from 'joi';
 import { InputValueIsWrongException } from './exceptions/inputValueIsWrongException';
-import {Input} from "./models/Input";
+import { Input } from './models/Input';
+import { Point } from './models/Point';
+import { Color } from './models/color';
+import { WhitePixelNotFoundException } from './exceptions/whitePixelNotFoundException';
 
 export class Reader {
   private testCase: number;
   private rowSize: number;
   private columnSize: number;
-  private inputList: Array<Array<number>> = [];
+  private inputList: Array<Array<Point>> = [];
 
   constructor(private readonly config: Config) {}
 
@@ -27,31 +30,31 @@ export class Reader {
           this.readRowColumnSize(line.toString());
           break;
         default:
-          this.readLine(line.toString());
+          this.readLine(line.toString(), lineNumber - 2);
       }
 
       lineNumber++;
     }
 
-    if (this.inputList.length !== this.rowSize) {
-      throw new InputValueIsWrongException(
-        `matrix input row count is wrong. should be ${this.rowSize}`,
-        this.rowSize,
-      );
-    }
+    this.validateRowSize();
+
+    const input = new Input(
+      this.testCase,
+      this.rowSize,
+      this.columnSize,
+      this.inputList,
+    );
+
+    const inputObject = input.toObject();
+    this.validateWhitePixel(inputObject);
 
     console.log('Test Case:  ', this.testCase);
     console.log('Row Size:   ', this.rowSize);
     console.log('Column Size:', this.columnSize);
     console.log('Input:');
-    console.table(this.inputList);
+    console.table(inputObject);
 
-    return {
-      rowSize: this.rowSize,
-      columnSize: this.columnSize,
-      testCase: this.testCase,
-      inputList: this.inputList
-    }
+    return input;
   }
 
   private readTestCase(line: string): void {
@@ -91,7 +94,7 @@ export class Reader {
     this.columnSize = Number(partial[1]);
   }
 
-  private readLine(line: string): void {
+  private readLine(line: string, rowIndex: number): void {
     const { error, value } = Joi.string()
       .required()
       .regex(/[0-1]+/)
@@ -105,6 +108,25 @@ export class Reader {
       );
     }
 
-    this.inputList.push([...value].map((s) => Number(s)));
+    const row = [];
+    for (let i = 0; i < [...value].length; i++) {
+      row.push(new Point(Number(value[i]) as Color, rowIndex, i));
+    }
+    this.inputList.push(row);
+  }
+
+  private validateWhitePixel(input: Array<Array<number>>) {
+    if (!input.find((row) => row.find((column) => column))) {
+      throw new WhitePixelNotFoundException();
+    }
+  }
+
+  private validateRowSize() {
+    if (this.inputList.length !== this.rowSize) {
+      throw new InputValueIsWrongException(
+        `matrix input row count is wrong. should be ${this.rowSize}`,
+        this.rowSize,
+      );
+    }
   }
 }

@@ -20,7 +20,7 @@ export class Config {
     INPUT_FILE_PATH: Joi.string().required(),
   });
 
-  public validate(): void {
+  public validate(): Config {
     const { error, value } = this.validationRules.validate(process.env, {
       convert: true,
       stripUnknown: true,
@@ -31,6 +31,8 @@ export class Config {
     }
 
     this.environment = value;
+
+    return this;
   }
 
   public getBitmapMin(): number {

@@ -1,8 +1,16 @@
 import { Config } from './config';
 import { Reader } from './reader';
+import { Calculator } from './calculator';
 
-const config = new Config();
-config.validate();
+/**
+ * Application Context
+ */
+(function main() {
+  const config = new Config().validate();
+  const input = new Reader(config).read();
+  const calculator = new Calculator(input);
+  const output = calculator.getResult();
 
-const reader = new Reader(config);
-reader.read();
+  console.log('Output:');
+  console.table(output);
+})();
