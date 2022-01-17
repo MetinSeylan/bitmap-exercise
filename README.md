@@ -20,7 +20,7 @@ The number of test cases t (1≤t≤1000) is in the first line of input, then t 
 ```
 ---
 
-####Output
+#### Output
 In the i-th line for each test case, 1<=i<=n, there should be written m integers f(i,1),...,f(i,m) separated by single spaces, where f(i,j) is the distance from the pixel (i,j) to the nearest white pixel. Example:
 ```
 3210
