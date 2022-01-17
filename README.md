@@ -38,7 +38,7 @@ After execution final result shows up in the terminal.
 ![Example output](./docs/console.png)
 
 ### Configuration
-Uses `.env` file
+Before start program you have to define environment file(`.env`) in the root folder, also you can rename `.env.example` file to `.env` with default parameters 
 
 | Key               | Default | Description                   |
 |-------------------|---------|-------------------------------|
